@@ -1,0 +1,82 @@
+diff --git a/public/app/plugins/panel/geomap/GeomapPanel.tsx b/public/app/plugins/panel/geomap/GeomapPanel.tsx
+index bbbb0eb351..06184b6d8e 100644
+--- a/public/app/plugins/panel/geomap/GeomapPanel.tsx
++++ b/public/app/plugins/panel/geomap/GeomapPanel.tsx
+@@ -5,15 +5,15 @@ import Attribution from 'ol/control/Attribution';
+ import ScaleLine from 'ol/control/ScaleLine';
+ import Zoom from 'ol/control/Zoom';
+ import { Coordinate } from 'ol/coordinate';
+-import { isEmpty } from 'ol/extent';
++import { isEmpty, getTopLeft, getBottomRight } from 'ol/extent';
+ import MouseWheelZoom from 'ol/interaction/MouseWheelZoom';
+-import { fromLonLat } from 'ol/proj';
++import { fromLonLat, toLonLat } from 'ol/proj';
+ import { Component, ReactNode } from 'react';
+ import * as React from 'react';
+ import { Subscription } from 'rxjs';
+ 
+-import { DataHoverEvent, PanelData, PanelProps } from '@grafana/data';
+-import { config } from '@grafana/runtime';
++import { DataHoverEvent, InterpolateFunction, PanelData, PanelProps } from '@grafana/data';
++import { config, locationService } from '@grafana/runtime';
+ import { PanelContext, PanelContextRoot } from '@grafana/ui';
+ import { PanelEditExitedEvent } from 'app/types/events';
+ 
+@@ -74,6 +74,49 @@ export class GeomapPanel extends Component<Props, State> {
+     );
+   }
+ 
++  updateDashboardVariables(map: OpenLayersMap, replaceVariables: InterpolateFunction) {
++    if (!map) {
++      return;
++    }
++
++    const extent = map.getView().calculateExtent(map.getSize());
++    const topLeft = toLonLat(getTopLeft(extent));
++    const bottomRight = toLonLat(getBottomRight(extent));
++    const zoom = Number(map.getView().getZoom());
++
++    let zpf = Number(replaceVariables('$zpf')) ? Number(replaceVariables('$zpf')) : 0.5;
++    let precision = Math.max(Math.min(zoom * zpf, 12), 1);
++
++    locationService.partial({ 'var-top': topLeft[1] }, true);
++    locationService.partial({ 'var-left': topLeft[0] }, true);
++    locationService.partial({ 'var-right': bottomRight[0] }, true);
++    locationService.partial({ 'var-bottom': bottomRight[1] }, true);
++    locationService.partial({ 'var-precision': precision.toFixed(0) }, true);
++    locationService.partial({ 'var-zpf': zpf }, true);
++  }
++
++  addViewMovedListener() {
++    if (!this.map) {
++      return;
++    }
++
++    let rV = this.props.replaceVariables;
++    let upv = this.updateDashboardVariables;
++    upv(this.map, rV);
++
++    let oldZoom = this.map.getView().getZoom();
++    let oldCenter = this.map.getView().getCenter();
++    this.map.on('moveend', function (e) {
++      let zoom = e.map.getView().getZoom();
++      let center = e.map.getView().getCenter();
++      if (oldZoom !== zoom || oldCenter !== center) {
++        upv(e.map, rV);
++        oldZoom = zoom;
++        oldCenter = center;
++      }
++    });
++  }
++
+   componentDidMount() {
+     this.panelContext = this.context;
+   }
+@@ -138,6 +181,7 @@ export class GeomapPanel extends Component<Props, State> {
+ 
+     notifyPanelEditor(this, layers, selected);
+     this.setState({ legends: this.getLegends() });
++    this.addViewMovedListener();
+   }
+ 
+   actions = getActions(this);
