@@ -1,5 +1,5 @@
 diff --git a/public/app/plugins/panel/geomap/GeomapPanel.tsx b/public/app/plugins/panel/geomap/GeomapPanel.tsx
-index bbbb0eb351..06184b6d8e 100644
+index bbbb0eb351..fbeceb2eb5 100644
 --- a/public/app/plugins/panel/geomap/GeomapPanel.tsx
 +++ b/public/app/plugins/panel/geomap/GeomapPanel.tsx
 @@ -5,15 +5,15 @@ import Attribution from 'ol/control/Attribution';
@@ -39,12 +39,12 @@ index bbbb0eb351..06184b6d8e 100644
 +    let zpf = Number(replaceVariables('$zpf')) ? Number(replaceVariables('$zpf')) : 0.5;
 +    let precision = Math.max(Math.min(zoom * zpf, 12), 1);
 +
-+    locationService.partial({ 'var-top': topLeft[1] }, true);
-+    locationService.partial({ 'var-left': topLeft[0] }, true);
-+    locationService.partial({ 'var-right': bottomRight[0] }, true);
-+    locationService.partial({ 'var-bottom': bottomRight[1] }, true);
-+    locationService.partial({ 'var-precision': precision.toFixed(0) }, true);
-+    locationService.partial({ 'var-zpf': zpf }, true);
++    locationService.partial({ 'top': topLeft[1] }, true);
++    locationService.partial({ 'left': topLeft[0] }, true);
++    locationService.partial({ 'right': bottomRight[0] }, true);
++    locationService.partial({ 'bottom': bottomRight[1] }, true);
++    locationService.partial({ 'precision': precision.toFixed(0) }, true);
++    locationService.partial({ 'zpf': zpf }, true);
 +  }
 +
 +  addViewMovedListener() {
