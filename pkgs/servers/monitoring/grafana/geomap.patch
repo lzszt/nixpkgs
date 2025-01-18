@@ -1,5 +1,5 @@
 diff --git a/public/app/plugins/panel/geomap/GeomapPanel.tsx b/public/app/plugins/panel/geomap/GeomapPanel.tsx
-index bbbb0eb351..fbeceb2eb5 100644
+index bbbb0eb351..eb5fd8b966 100644
 --- a/public/app/plugins/panel/geomap/GeomapPanel.tsx
 +++ b/public/app/plugins/panel/geomap/GeomapPanel.tsx
 @@ -5,15 +5,15 @@ import Attribution from 'ol/control/Attribution';
@@ -80,3 +80,12 @@ index bbbb0eb351..fbeceb2eb5 100644
    }
  
    actions = getActions(this);
+@@ -222,7 +266,7 @@ export class GeomapPanel extends Component<Props, State> {
+     this.map = map; // redundant
+     this.initViewExtent(map.getView(), options.view);
+ 
+-    this.mouseWheelZoom = new MouseWheelZoom();
++    this.mouseWheelZoom = new MouseWheelZoom(condition: (event) => event.originalEvent.ctrlKey,);
+     this.map?.addInteraction(this.mouseWheelZoom);
+ 
+     updateMap(this, options);
