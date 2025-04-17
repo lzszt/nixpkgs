@@ -34,6 +34,11 @@ gem 'rqrcode'
 gem "html-pipeline", "~> 2.13.2"
 gem "sanitize", "~> 6.0"
 
+# Plugins
+gem 'slim'
+gem 'slim-rails'
+gem 'redmine_plugin_kit'
+
 # Optional gem for LDAP authentication
 group :ldap do
   gem 'net-ldap', '~> 0.17.0'
