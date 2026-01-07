@@ -1,6 +1,7 @@
 {
   lib,
   stdenv,
+  nodejs_22,
   buildNpmPackage,
   fetchFromGitHub,
   electron,
@@ -28,7 +29,7 @@ let
       '';
 in
 
-buildNpmPackage {
+buildNpmPackage.override { nodejs = nodejs_22; } {
   pname = "sieve-editor-gui";
   version = "0.6.1-unstable-2025-03-12";
 
